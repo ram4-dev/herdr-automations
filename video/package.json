@@ -1,0 +1,21 @@
+{
+  "name": "herdr-automation-permissions-video",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "studio": "remotion studio src/index.ts --no-open",
+    "render": "remotion render src/index.ts HerdrAutomationPermissions out/herdr-automation-permissions.mp4",
+    "still": "remotion still src/index.ts HerdrAutomationPermissions out/preview.png --frame=525"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.509",
+    "@remotion/transitions": "4.0.509",
+    "@types/react": "19.1.9",
+    "@types/react-dom": "19.1.7",
+    "react": "19.1.1",
+    "react-dom": "19.1.1",
+    "remotion": "4.0.509",
+    "typescript": "5.9.3"
+  }
+}

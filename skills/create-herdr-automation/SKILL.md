@@ -16,6 +16,9 @@ Safely mutate the live `automations.yaml` for plugin `ram4.herdr-automations`, t
 - Always backup before replace. Validate candidate YAML before replacing the live file when possible. Reload the worker; on invalid config restore the backup.
 - Do not modify global Herdr config, keybindings, or unrelated plugins.
 - `herdr plugin action invoke` is asynchronous: a `0` exit only means the command was enqueued. Always wait on the returned `log_id` via `herdr plugin log list` until `succeeded`/`failed` before trusting reload/status.
+- Treat external writes (email, messages, calendar changes, publishing, payments, or similar connector actions) as approval-sensitive. Before enabling recurrence, warn that a one-time approval can let the first run succeed while a later run blocks at the permission prompt.
+- Never broaden connector permissions silently. Obtain explicit user authorization before selecting a persistent approval such as `Always allow`, and scope it to the exact repeated action, identity, destination, and connector.
+- For approval-sensitive agent actions, scheduler health or `lastStatus: succeeded` alone is insufficient. Inspect the agent pane/status for a permission prompt and verify at least the second scheduled execution completes autonomously before reporting recurrence as working.
 
 ## Workflow
 
@@ -34,6 +37,8 @@ SCHEMA_REF="$SKILL_DIR/references/schema.md"
    - `CONFIG="$CONFIG_DIR/automations.yaml"`
 2. **Read** current YAML. If missing, seed from the plugin example (disabled defaults) rather than an empty invalid file.
 3. **Plan** the smallest change (create / update fields / delete by `id`). Confirm ids match `^[a-z][a-z0-9_-]{0,63}$`.
+   - If the action performs an external write, identify the connector, acting account, destination, and expected approval boundary.
+   - Warn the user before enabling it that a one-time permission may block later runs. Ask for persistent permission only when recurrence requires it and the repeated action is narrowly scoped.
 4. **Write a temporary candidate** (never edit the live file by hand mid-flight):
 
 ```bash
@@ -51,10 +56,15 @@ python3 "$APPLY" --stdin < "$CANDIDATE"
 
 The script: discovers config-dir (or `--config`), backs up, validates, atomically replaces, invokes reload, **polls** `plugin log list` until that `log_id` finishes, then invokes status the same way and parses the **action log stdout** (not the invoke wrapper). On failure it restores the backup and best-effort reloads.
 
-6. **Verify**
+6. **Verify configuration and worker**
    - Prefer the script result JSON (`reloaded: true`).
-   - Optionally: `herdr plugin log list --plugin ram4.herdr-automations --limit 10`
-7. **Report** config path, backup path, what changed, reload/status log outcomes. Remove `$CANDIDATE` when done.
+   - Optionally: `herdr plugin log list --plugin ram4.herdr-automations --limit 10`.
+7. **Verify recurrence for approval-sensitive actions**
+   - Observe the first execution and inspect its agent pane/status through Herdr.
+   - If a connector approval appears, do not leave the run blocked or claim success. Explain the scope and obtain explicit user authorization before choosing persistent approval.
+   - Observe the next scheduled execution. Require the external tool to report completion, the agent to return to `done`, and the scheduler to advance `nextRunAt` without another prompt.
+   - If a second live execution would be slow, costly, destructive, or otherwise disproportionate, state that it remains unverified instead of claiming durable recurrence.
+8. **Report** config path, backup path, what changed, reload/status log outcomes, the external-permission scope (if any), and whether a second autonomous run was verified. Remove `$CANDIDATE` when done.
 
 ## Manual fallback (if script unavailable)
 
@@ -64,7 +74,8 @@ The script: discovers config-dir (or `--config`), backs up, validates, atomicall
 4. `INV=$(herdr plugin action invoke ram4.herdr-automations.reload)` → read `result.log.log_id`.
 5. Poll `herdr plugin log list --plugin ram4.herdr-automations --limit 30` until that log is `succeeded` or `failed` (timeout ~30s).
 6. Repeat invoke+poll for `ram4.herdr-automations.status`; parse **log.stdout** JSON; require `local.workerHealthy` or a real worker `result` and no `configError`.
-7. If anything fails, restore backup and reload again (waiting on logs).
+7. For approval-sensitive external writes, inspect the agent and verify the second autonomous scheduled execution as described above.
+8. If anything fails, restore the backup and reload again (waiting on logs).
 
 ## Resources
 

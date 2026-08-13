@@ -163,6 +163,20 @@ v1 does not fake unsupported in-TUI create/edit forms; structural edits go throu
 
 Bundled skill for safe YAML mutations: `skills/create-herdr-automation` (`$create-herdr-automation`). Install into your Codex skills directory after review; it is not auto-linked from this repo.
 
+For recurring agent actions that write through an external connector (email, messaging, calendar, publishing, payments, and similar), a one-time connector approval can make the first run succeed while a later run blocks at the permission prompt. The bundled skill requires an explicit, narrowly scoped persistent approval when recurrence needs it and verifies a second autonomous scheduled run before reporting success.
+
+## Demo video
+
+The vertical Remotion explainer in `video/` demonstrates this permission boundary and the verification loop. Render it with:
+
+```sh
+cd video
+npm install
+npm run render
+```
+
+The MP4 is written to `video/out/herdr-automation-permissions.mp4` and intentionally ignored by Git.
+
 ## License
 
 MIT

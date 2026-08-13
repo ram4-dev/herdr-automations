@@ -30,6 +30,9 @@ tmp/
 automations.yaml.bak*
 .automations.*.yaml
 
+# Rendered video artifacts (source remains in video/)
+video/out/
+
 # Editor / IDE
 .idea/
 .vscode/
