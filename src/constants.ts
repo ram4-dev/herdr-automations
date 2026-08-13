@@ -1,0 +1,21 @@
+export const PLUGIN_ID = "ram4.herdr-automations";
+/** Manifest [[panes]] id opened by the `open` action via `herdr plugin pane open`. */
+export const BOARD_PANE_ENTRYPOINT = "board";
+export const CONFIG_FILE_NAME = "automations.yaml";
+export const STATE_DB_NAME = "automations.sqlite";
+export const WORKER_LOCK_NAME = "worker.lock";
+export const WORKER_PID_NAME = "worker.pid";
+export const CONTROL_SOCK_NAME = "control.sock";
+export const HEARTBEAT_NAME = "worker.heartbeat";
+export const DEFAULT_TIMEZONE = "America/Argentina/Buenos_Aires";
+export const DEFAULT_TIMEOUT_SECONDS = 1800;
+export const GLOBAL_CONCURRENCY = 2;
+export const HEARTBEAT_INTERVAL_MS = 5_000;
+export const STALE_HEARTBEAT_MS = 20_000;
+export const SCHEDULER_TICK_MS = 1_000;
+export const CONTROL_REQUEST_TIMEOUT_MS = 2_000;
+export const HERDR_SOCKET_REQUEST_TIMEOUT_MS = 2_000;
+export const WORKER_ENSURE_TIMEOUT_MS = 2_500;
+export const WORKER_ENSURE_POLL_MS = 50;
+export const COMPLETION_SENTINEL_PREFIX = "HERDR_AUTOMATION_DONE:";
+export const TAB_LABEL_PREFIX = "auto:";

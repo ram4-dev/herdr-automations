@@ -1,0 +1,92 @@
+id = "ram4.herdr-automations"
+name = "Automations"
+version = "0.1.0"
+min_herdr_version = "0.8.0"
+description = "Declarative cron, interval, and Herdr-event automations with a popup TUI"
+platforms = ["linux", "macos"]
+
+# Runs during `herdr plugin install` (not `plugin link`). Reproducible from bun.lock.
+[[build]]
+command = ["bun", "install", "--frozen-lockfile"]
+
+[[startup]]
+command = ["bun", "run", "src/main.ts", "ensure-worker"]
+
+[[actions]]
+id = "open"
+title = "Open automations"
+description = "Open the Automations popup board in the active Herdr session"
+contexts = ["global"]
+command = ["bun", "run", "src/main.ts", "open"]
+
+[[actions]]
+id = "status"
+title = "Automations status"
+description = "Print worker and automation status as JSON"
+contexts = ["global"]
+command = ["bun", "run", "src/main.ts", "status"]
+
+[[actions]]
+id = "reload"
+title = "Reload automations"
+description = "Reload automations.yaml in the running worker"
+contexts = ["global"]
+command = ["bun", "run", "src/main.ts", "reload"]
+
+[[actions]]
+id = "pause"
+title = "Pause automations"
+description = "Pause all automatic triggers"
+contexts = ["global"]
+command = ["bun", "run", "src/main.ts", "pause"]
+
+[[actions]]
+id = "resume"
+title = "Resume automations"
+description = "Resume automatic triggers"
+contexts = ["global"]
+command = ["bun", "run", "src/main.ts", "resume"]
+
+[[actions]]
+id = "run-now"
+title = "Run automation now"
+description = "Manually run one automation by id (HERDR_PLUGIN_CONTEXT_JSON.selected_text or AUTOMATION_ID)"
+contexts = ["global"]
+command = ["bun", "run", "src/main.ts", "run-now"]
+
+[[actions]]
+id = "retry"
+title = "Retry automation"
+description = "Retry the latest failed or interrupted run (automation id via context/env)"
+contexts = ["global"]
+command = ["bun", "run", "src/main.ts", "retry"]
+
+[[actions]]
+id = "cancel"
+title = "Cancel queued run"
+description = "Cancel the latest queued run for an automation (not executing runs)"
+contexts = ["global"]
+command = ["bun", "run", "src/main.ts", "cancel"]
+
+[[actions]]
+id = "enable"
+title = "Enable automation"
+description = "Enable one automation by id (context/env)"
+contexts = ["global"]
+command = ["bun", "run", "src/main.ts", "enable"]
+
+[[actions]]
+id = "disable"
+title = "Disable automation"
+description = "Disable one automation by id (context/env)"
+contexts = ["global"]
+command = ["bun", "run", "src/main.ts", "disable"]
+
+[[panes]]
+id = "board"
+title = "Automations"
+description = "Status, triggers, next run, last result, and controls"
+placement = "popup"
+width = "84%"
+height = "70%"
+command = ["bun", "run", "src/main.ts", "ui"]

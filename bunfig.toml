@@ -1,0 +1,3 @@
+[test]
+# Avoid cross-file races on HERDR_PLUGIN_* process.env paths.
+maxConcurrency = 1

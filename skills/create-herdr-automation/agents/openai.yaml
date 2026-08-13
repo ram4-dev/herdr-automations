@@ -1,0 +1,4 @@
+interface:
+  display_name: "Create Herdr Automation"
+  short_description: "Safely edit Herdr automations YAML"
+  default_prompt: "Use $create-herdr-automation to add or update a Herdr automation safely."

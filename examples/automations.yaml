@@ -1,0 +1,64 @@
+# Annotated example for ram4.herdr-automations
+# Install/link the plugin, then copy to:
+#   $(herdr plugin config-dir ram4.herdr-automations)/automations.yaml
+#
+# Safety: every example below is disabled. Enable only after reviewing cwd/command/agent.
+#
+# Rules:
+# - cwd must be an absolute filesystem path (never persist Herdr IDs)
+# - one action per automation (command XOR agent)
+# - cron uses five fields + optional timezone
+# - interval uses Ns / Nm / Nh
+# - event triggers use equality match filters and are never replayed on restart
+
+version: 1
+
+defaults:
+  timezone: America/Argentina/Buenos_Aires
+  overlap: skip
+  catch_up: latest
+  timeout_seconds: 1800
+
+automations:
+  - id: weekday-morning
+    name: Weekday morning ping
+    enabled: false
+    cwd: /tmp
+    trigger:
+      type: cron
+      expr: "30 9 * * 1-5"
+      timezone: America/Argentina/Buenos_Aires
+    action:
+      type: command
+      command: ["echo", "good morning from herdr-automations"]
+      env:
+        AUTOMATION_DEMO: "1"
+      timeout_seconds: 60
+
+  - id: every-hour-uname
+    enabled: false
+    cwd: /tmp
+    trigger:
+      type: interval
+      every: 1h
+    action:
+      type: command
+      command: ["uname", "-a"]
+
+  - id: on-agent-blocked
+    name: React to blocked agents
+    enabled: false
+    cwd: /tmp
+    trigger:
+      type: event
+      event: pane.agent_status_changed
+      match:
+        agent_status: blocked
+    action:
+      type: agent
+      kind: codex
+      name: auto-blocked
+      prompt: >
+        A Herdr agent reported status=blocked. Read nearby context if available
+        and suggest the smallest safe next step. Do not modify unrelated work.
+      timeout_seconds: 1800

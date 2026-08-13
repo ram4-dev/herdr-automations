@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ram4-dev/herdr-automations/schema/automations.schema.json",
+  "title": "Herdr Automations config",
+  "type": "object",
+  "required": ["version", "automations"],
+  "additionalProperties": false,
+  "properties": {
+    "version": { "const": 1 },
+    "defaults": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "timezone": { "type": "string", "default": "America/Argentina/Buenos_Aires" },
+        "overlap": { "const": "skip", "default": "skip" },
+        "catch_up": { "enum": ["latest", "none"], "default": "latest" },
+        "timeout_seconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 86400,
+          "default": 1800
+        }
+      }
+    },
+    "automations": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/automation" }
+    }
+  },
+  "$defs": {
+    "automation": {
+      "type": "object",
+      "required": ["id", "cwd", "trigger", "action"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_-]{0,63}$"
+        },
+        "name": { "type": "string", "minLength": 1 },
+        "enabled": { "type": "boolean", "default": true },
+        "cwd": {
+          "type": "string",
+          "pattern": "^/"
+        },
+        "overlap": { "const": "skip" },
+        "catch_up": { "enum": ["latest", "none"] },
+        "timezone": { "type": "string", "minLength": 1 },
+        "timeout_seconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 86400
+        },
+        "trigger": {
+          "oneOf": [
+            { "$ref": "#/$defs/cronTrigger" },
+            { "$ref": "#/$defs/intervalTrigger" },
+            { "$ref": "#/$defs/eventTrigger" }
+          ]
+        },
+        "action": {
+          "oneOf": [{ "$ref": "#/$defs/commandAction" }, { "$ref": "#/$defs/agentAction" }]
+        }
+      }
+    },
+    "cronTrigger": {
+      "type": "object",
+      "required": ["type", "expr"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "cron" },
+        "expr": {
+          "type": "string",
+          "pattern": "^(\\S+)\\s+(\\S+)\\s+(\\S+)\\s+(\\S+)\\s+(\\S+)$"
+        },
+        "timezone": { "type": "string", "minLength": 1 }
+      }
+    },
+    "intervalTrigger": {
+      "type": "object",
+      "required": ["type", "every"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "interval" },
+        "every": { "type": "string", "pattern": "^[0-9]+[smh]$" }
+      }
+    },
+    "eventTrigger": {
+      "type": "object",
+      "required": ["type", "event"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "event" },
+        "event": { "type": "string", "minLength": 1 },
+        "match": {
+          "type": "object",
+          "additionalProperties": {
+            "type": ["string", "number", "boolean", "null"]
+          }
+        }
+      }
+    },
+    "commandAction": {
+      "type": "object",
+      "required": ["type", "command"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "command" },
+        "command": {
+          "oneOf": [
+            { "type": "string", "minLength": 1 },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": { "type": "string", "minLength": 1 }
+            }
+          ]
+        },
+        "env": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        },
+        "timeout_seconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 86400
+        }
+      }
+    },
+    "agentAction": {
+      "type": "object",
+      "required": ["type", "kind", "name", "prompt"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "agent" },
+        "kind": { "type": "string", "minLength": 1 },
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_-]{0,31}$"
+        },
+        "prompt": { "type": "string", "minLength": 1 },
+        "timeout_seconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 86400
+        }
+      }
+    }
+  }
+}
