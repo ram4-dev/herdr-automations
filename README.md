@@ -167,7 +167,7 @@ For recurring agent actions that write through an external connector (email, mes
 
 ## Demo video
 
-The 16:9 Remotion product video in `video/` demonstrates the complete automation workflow: declarative configuration, durable scheduling, visible execution, status/history, and controls. Render it with:
+The 16:9 Remotion product demo in `video/` follows one continuous Herdr session: open the popup board, edit YAML through `$EDITOR`, reload, run an automation, observe the reusable agent pane, inspect history, and pause automatic triggers. Render it with:
 
 ```sh
 cd video

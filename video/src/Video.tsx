@@ -1,735 +1,777 @@
 import type { CSSProperties, ReactNode } from "react";
 import { AbsoluteFill, Easing, interpolate, useCurrentFrame } from "remotion";
-import { TransitionSeries, linearTiming } from "@remotion/transitions";
-import { fade } from "@remotion/transitions/fade";
-import { slide } from "@remotion/transitions/slide";
 
 const c = {
-  bg: "#07090E",
-  panel: "#111722",
-  panel2: "#151D2A",
-  line: "#283449",
-  text: "#F7F9FD",
-  muted: "#9DAAC0",
-  violet: "#8A78FF",
-  cyan: "#48D5E7",
-  green: "#52E39A",
+  desktop: "#080B11",
+  chrome: "#151B26",
+  chrome2: "#1B2331",
+  terminal: "#0B1018",
+  line: "#2B374B",
+  text: "#EDF2FA",
+  muted: "#91A0B7",
+  violet: "#8C7CFF",
+  cyan: "#4BD7E9",
+  green: "#53E39B",
   amber: "#FFCA62",
   red: "#FF7180",
 };
 
-const base: CSSProperties = {
+const ui: CSSProperties = {
   fontFamily: "Inter, SF Pro Display, -apple-system, BlinkMacSystemFont, sans-serif",
   color: c.text,
 };
 
-const enter = (frame: number, delay = 0, distance = 34) => ({
-  opacity: interpolate(frame, [delay, delay + 14], [0, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-    easing: Easing.bezier(0.16, 1, 0.3, 1),
-  }),
-  translate: `${interpolate(frame, [delay, delay + 18], [-distance, 0], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-    easing: Easing.bezier(0.16, 1, 0.3, 1),
-  })}px 0`,
-});
-
-const Scene = ({ children, index }: { children: ReactNode; index: string }) => {
-  const frame = useCurrentFrame();
-  return (
-    <AbsoluteFill
-      style={{
-        ...base,
-        background:
-          "radial-gradient(circle at 88% 8%, #292160 0%, transparent 34%), radial-gradient(circle at 2% 96%, #0B414A 0%, transparent 31%), #07090E",
-        padding: "58px 92px 52px",
-      }}
-    >
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          opacity: 0.16,
-          backgroundImage:
-            "linear-gradient(#FFFFFF0A 1px, transparent 1px), linear-gradient(90deg, #FFFFFF0A 1px, transparent 1px)",
-          backgroundSize: "60px 60px",
-          translate: `${interpolate(frame, [0, 180], [0, -18])}px ${interpolate(frame, [0, 180], [0, -18])}px`,
-        }}
-      />
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          zIndex: 2,
-          fontSize: 25,
-          fontWeight: 800,
-          letterSpacing: 2,
-          textTransform: "uppercase",
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: 15 }}>
-          <div
-            style={{
-              width: 16,
-              height: 16,
-              borderRadius: 99,
-              background: c.violet,
-              boxShadow: `0 0 28px ${c.violet}`,
-            }}
-          />
-          Herdr Automations
-        </div>
-        <div style={{ color: c.muted }}>{index}</div>
-      </div>
-      <div style={{ flex: 1, display: "flex", alignItems: "center", zIndex: 1 }}>{children}</div>
-      <div style={{ display: "flex", alignItems: "center", gap: 24, zIndex: 2 }}>
-        <div
-          style={{ height: 4, flex: 1, background: c.line, borderRadius: 99, overflow: "hidden" }}
-        >
-          <div
-            style={{
-              height: "100%",
-              width: `${interpolate(frame, [0, 180], [0, 100], { extrapolateRight: "clamp" })}%`,
-              background: `linear-gradient(90deg, ${c.violet}, ${c.cyan})`,
-            }}
-          />
-        </div>
-        <div style={{ fontSize: 23, color: c.muted, fontWeight: 700 }}>
-          github.com/ram4-dev/herdr-automations
-        </div>
-      </div>
-    </AbsoluteFill>
-  );
+const mono: CSSProperties = {
+  fontFamily: "SFMono-Regular, Menlo, Monaco, Consolas, monospace",
+  color: c.text,
 };
 
-const Badge = ({ children, color = c.cyan }: { children: ReactNode; color?: string }) => (
-  <div
-    style={{
-      display: "inline-flex",
-      alignSelf: "flex-start",
-      padding: "10px 18px",
-      borderRadius: 99,
-      background: `${color}16`,
-      border: `2px solid ${color}70`,
-      color,
-      fontSize: 23,
-      fontWeight: 850,
-      letterSpacing: 1,
-      textTransform: "uppercase",
-    }}
-  >
-    {children}
-  </div>
-);
+const clamp = {
+  extrapolateLeft: "clamp" as const,
+  extrapolateRight: "clamp" as const,
+};
 
-const Title = ({ children }: { children: ReactNode }) => (
-  <div style={{ fontSize: 84, lineHeight: 0.98, fontWeight: 880, letterSpacing: -4 }}>
-    {children}
-  </div>
-);
+const fade = (frame: number, start: number, end: number) =>
+  interpolate(frame, [start, start + 12, end - 12, end], [0, 1, 1, 0], {
+    ...clamp,
+    easing: Easing.bezier(0.16, 1, 0.3, 1),
+  });
 
-const Copy = ({ children }: { children: ReactNode }) => (
-  <div style={{ fontSize: 34, lineHeight: 1.28, color: c.muted, fontWeight: 560 }}>{children}</div>
-);
-
-const Window = ({
+const TerminalWindow = ({
   title,
   children,
-  accent = c.violet,
+  style,
 }: {
   title: string;
   children: ReactNode;
-  accent?: string;
+  style?: CSSProperties;
 }) => (
   <div
     style={{
-      background: `${c.panel}F2`,
-      border: `2px solid ${c.line}`,
-      borderRadius: 28,
+      background: c.terminal,
+      border: `1px solid ${c.line}`,
+      borderRadius: 18,
       overflow: "hidden",
-      boxShadow: "0 34px 80px #00000070",
+      boxShadow: "0 28px 90px #00000080",
+      ...style,
     }}
   >
     <div
       style={{
-        height: 58,
-        padding: "0 24px",
-        display: "flex",
+        ...ui,
+        height: 48,
+        display: "grid",
+        gridTemplateColumns: "1fr auto 1fr",
         alignItems: "center",
-        justifyContent: "space-between",
-        background: c.panel2,
-        borderBottom: `2px solid ${c.line}`,
+        padding: "0 18px",
+        background: c.chrome2,
+        borderBottom: `1px solid ${c.line}`,
         color: c.muted,
-        fontSize: 22,
+        fontSize: 17,
         fontWeight: 750,
       }}
     >
-      <div style={{ display: "flex", gap: 9 }}>
+      <div style={{ display: "flex", gap: 8 }}>
         {[c.red, c.amber, c.green].map((color) => (
-          <div key={color} style={{ width: 13, height: 13, borderRadius: 99, background: color }} />
+          <div key={color} style={{ width: 12, height: 12, borderRadius: 99, background: color }} />
         ))}
       </div>
-      {title}
-      <div style={{ width: 55, height: 5, borderRadius: 99, background: accent }} />
+      <div>{title}</div>
+      <div />
     </div>
     {children}
   </div>
 );
 
-const Intro = () => {
-  const frame = useCurrentFrame();
-  const chips = ["cron", "intervalos", "eventos Herdr"];
-  return (
-    <Scene index="01 / 06">
-      <div
-        style={{
-          width: "100%",
-          display: "grid",
-          gridTemplateColumns: "0.95fr 1.05fr",
-          gap: 90,
-          alignItems: "center",
-        }}
-      >
-        <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
-          <div style={enter(frame, 0)}>
-            <Badge>Automatización observable</Badge>
-          </div>
-          <div style={enter(frame, 8)}>
-            <Title>
-              Tus agentes trabajan
-              <br />
-              <span style={{ color: c.cyan }}>aunque cierres el pane.</span>
-            </Title>
-          </div>
-          <div style={enter(frame, 16)}>
-            <Copy>Programá comandos y agentes con un worker durable dentro de Herdr.</Copy>
-          </div>
-          <div style={{ display: "flex", gap: 14 }}>
-            {chips.map((chip, i) => (
-              <div
-                key={chip}
-                style={{
-                  ...enter(frame, 24 + i * 6),
-                  padding: "12px 18px",
-                  borderRadius: 14,
-                  background: c.panel,
-                  border: `1px solid ${c.line}`,
-                  fontSize: 24,
-                  fontWeight: 750,
-                }}
-              >
-                {chip}
-              </div>
-            ))}
-          </div>
-        </div>
-        <div style={enter(frame, 18)}>
-          <Window title="Automations board">
-            <div style={{ padding: 28, display: "flex", flexDirection: "column", gap: 16 }}>
-              {[
-                ["Daily research", "cron 0 9 * * 1-5", "scheduled", c.cyan],
-                ["Inbox summary", "every 30m", "running", c.green],
-                ["Blocked agent alert", "pane.agent_status_changed", "watching", c.violet],
-              ].map(([name, trigger, status, color]) => (
-                <div
-                  key={name}
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "1.2fr 1.1fr 0.7fr",
-                    alignItems: "center",
-                    padding: "20px 22px",
-                    borderRadius: 18,
-                    background: c.panel2,
-                    fontSize: 23,
-                  }}
-                >
-                  <div style={{ fontWeight: 820 }}>{name}</div>
-                  <div
-                    style={{
-                      color: c.muted,
-                      fontFamily: "SFMono-Regular, monospace",
-                      fontSize: 19,
-                    }}
-                  >
-                    {trigger}
-                  </div>
-                  <div style={{ justifySelf: "end", color, fontWeight: 800 }}>{status}</div>
-                </div>
-              ))}
-            </div>
-          </Window>
-        </div>
-      </div>
-    </Scene>
-  );
+const Key = ({ children }: { children: ReactNode }) => (
+  <span
+    style={{
+      ...mono,
+      display: "inline-flex",
+      alignItems: "center",
+      justifyContent: "center",
+      minWidth: 30,
+      height: 28,
+      padding: "0 7px",
+      borderRadius: 6,
+      background: c.chrome2,
+      border: `1px solid ${c.line}`,
+      fontSize: 16,
+      fontWeight: 800,
+    }}
+  >
+    {children}
+  </span>
+);
+
+type Row = {
+  state: string;
+  id: string;
+  trigger: string;
+  next: string;
+  last: string;
 };
 
-const Configure = () => {
-  const frame = useCurrentFrame();
-  const lines = [
-    ["id:", "daily-research"],
-    ["enabled:", "true"],
-    ["trigger:", "cron 0 9 * * 1-5"],
-    ["action:", "agent · codex"],
-    ["prompt:", "Summarize today’s signals"],
-  ];
-  return (
-    <Scene index="02 / 06">
-      <div
-        style={{
-          width: "100%",
-          display: "grid",
-          gridTemplateColumns: "0.78fr 1.22fr",
-          gap: 90,
-          alignItems: "center",
-        }}
-      >
-        <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
-          <div style={enter(frame, 0)}>
-            <Badge color={c.violet}>1. Declarar</Badge>
-          </div>
-          <div style={enter(frame, 8)}>
-            <Title>
-              Una tarea.
-              <br />
-              <span style={{ color: c.violet }}>Un archivo YAML.</span>
-            </Title>
-          </div>
-          <div style={enter(frame, 16)}>
-            <Copy>Definí cuándo corre, dónde trabaja y qué agente o comando ejecuta.</Copy>
-          </div>
-        </div>
-        <div style={enter(frame, 16)}>
-          <Window title="automations.yaml" accent={c.violet}>
-            <div
-              style={{
-                padding: "30px 36px",
-                fontFamily: "SFMono-Regular, Menlo, monospace",
-                fontSize: 26,
-                lineHeight: 1.65,
-              }}
-            >
-              <div style={{ color: c.muted }}>automations:</div>
-              {lines.map(([key, value], i) => (
-                <div
-                  key={key}
-                  style={{
-                    ...enter(frame, 24 + i * 7, 20),
-                    display: "grid",
-                    gridTemplateColumns: "170px 1fr",
-                    paddingLeft: 36,
-                  }}
-                >
-                  <span style={{ color: c.cyan }}>
-                    {i === 0 ? "- " : "  "}
-                    {key}
-                  </span>
-                  <span style={{ color: i === 1 ? c.green : c.text }}>{value}</span>
-                </div>
-              ))}
-            </div>
-          </Window>
-        </div>
+const Board = ({
+  selected = 0,
+  rows,
+  paused = false,
+  message = "",
+}: {
+  selected?: number;
+  rows: Row[];
+  paused?: boolean;
+  message?: string;
+}) => (
+  <div style={{ ...mono, padding: "24px 30px 22px", fontSize: 19, lineHeight: 1.45 }}>
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: 7,
+      }}
+    >
+      <div>
+        <span style={{ color: c.cyan, fontWeight: 900 }}>Herdr Automations</span>
+        <span style={{ color: c.muted }}> worker=20610 </span>
+        <span style={{ color: paused ? c.amber : c.green, fontWeight: 850 }}>
+          {paused ? "PAUSED" : "RUNNING"}
+        </span>
       </div>
-    </Scene>
-  );
-};
-
-const Schedule = () => {
-  const frame = useCurrentFrame();
-  const progress = interpolate(frame, [20, 145], [0, 100], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-  return (
-    <Scene index="03 / 06">
+      <span style={{ color: c.muted, fontSize: 15 }}>
+        config: ~/.config/herdr/.../automations.yaml
+      </span>
+    </div>
+    <div style={{ height: 1, background: c.line, margin: "12px 0 15px" }} />
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "34px 125px 210px 300px 220px 1fr",
+        color: c.muted,
+        fontWeight: 800,
+        fontSize: 16,
+        marginBottom: 8,
+      }}
+    >
+      <div />
+      <div>STATUS</div>
+      <div>ID</div>
+      <div>TRIGGER</div>
+      <div>NEXT</div>
+      <div>LAST</div>
+    </div>
+    {rows.map((row, index) => (
       <div
+        key={row.id}
         style={{
-          width: "100%",
           display: "grid",
-          gridTemplateColumns: "0.9fr 1.1fr",
-          gap: 88,
+          gridTemplateColumns: "34px 125px 210px 300px 220px 1fr",
           alignItems: "center",
+          minHeight: 44,
+          padding: "3px 0",
+          borderRadius: 7,
+          background: index === selected ? "#24324A" : "transparent",
         }}
       >
-        <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
-          <div style={enter(frame, 0)}>
-            <Badge color={c.amber}>2. Programar</Badge>
-          </div>
-          <div style={enter(frame, 8)}>
-            <Title>
-              El worker recuerda
-              <br />
-              <span style={{ color: c.amber }}>la próxima corrida.</span>
-            </Title>
-          </div>
-          <div style={enter(frame, 16)}>
-            <Copy>Persistencia, deduplicación, catch-up controlado y overlap seguro.</Copy>
-          </div>
-        </div>
-        <div style={enter(frame, 16)}>
-          <Window title="Durable scheduler" accent={c.amber}>
-            <div style={{ padding: 38, display: "flex", flexDirection: "column", gap: 30 }}>
-              <div
-                style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}
-              >
-                <div>
-                  <div style={{ fontSize: 25, color: c.muted }}>Próxima ejecución</div>
-                  <div
-                    style={{ fontSize: 64, fontWeight: 880, fontVariantNumeric: "tabular-nums" }}
-                  >
-                    09:00:00
-                  </div>
-                </div>
-                <div
-                  style={{
-                    padding: "12px 19px",
-                    color: c.green,
-                    background: `${c.green}16`,
-                    borderRadius: 99,
-                    fontSize: 23,
-                    fontWeight: 850,
-                  }}
-                >
-                  worker healthy
-                </div>
-              </div>
-              <div style={{ height: 22, borderRadius: 99, background: c.line, overflow: "hidden" }}>
-                <div
-                  style={{
-                    height: "100%",
-                    width: `${progress}%`,
-                    background: `linear-gradient(90deg, ${c.violet}, ${c.amber})`,
-                  }}
-                />
-              </div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 18 }}>
-                {[
-                  ["overlap", "skip"],
-                  ["catch-up", "latest"],
-                  ["concurrency", "2"],
-                ].map(([label, value], i) => (
-                  <div
-                    key={label}
-                    style={{
-                      ...enter(frame, 28 + i * 7),
-                      padding: 22,
-                      background: c.panel2,
-                      borderRadius: 18,
-                    }}
-                  >
-                    <div style={{ fontSize: 20, color: c.muted }}>{label}</div>
-                    <div style={{ fontSize: 30, fontWeight: 850, marginTop: 7 }}>{value}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </Window>
-        </div>
-      </div>
-    </Scene>
-  );
-};
-
-const Execute = () => {
-  const frame = useCurrentFrame();
-  const output = [
-    "Starting Codex agent…",
-    "Reading workspace context…",
-    "Running daily research…",
-    "✓ Result saved · agent done",
-  ];
-  return (
-    <Scene index="04 / 06">
-      <div
-        style={{
-          width: "100%",
-          display: "grid",
-          gridTemplateColumns: "0.76fr 1.24fr",
-          gap: 82,
-          alignItems: "center",
-        }}
-      >
-        <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
-          <div style={enter(frame, 0)}>
-            <Badge color={c.green}>3. Ejecutar</Badge>
-          </div>
-          <div style={enter(frame, 8)}>
-            <Title>
-              La ejecución
-              <br />
-              <span style={{ color: c.green }}>se puede ver.</span>
-            </Title>
-          </div>
-          <div style={enter(frame, 16)}>
-            <Copy>
-              Herdr abre o reutiliza un pane en el workspace correcto. Nada corre a oscuras.
-            </Copy>
-          </div>
-        </div>
-        <div style={enter(frame, 16)}>
-          <Window title="auto:daily-research · Codex" accent={c.green}>
-            <div
-              style={{
-                padding: 36,
-                minHeight: 360,
-                fontFamily: "SFMono-Regular, Menlo, monospace",
-                fontSize: 25,
-                lineHeight: 1.75,
-              }}
-            >
-              <div style={{ color: c.violet, marginBottom: 18 }}>› Summarize today’s signals</div>
-              {output.map((line, i) => (
-                <div
-                  key={line}
-                  style={{
-                    ...enter(frame, 28 + i * 18, 14),
-                    color: i === output.length - 1 ? c.green : c.muted,
-                  }}
-                >
-                  {i === output.length - 1 ? "" : "• "}
-                  {line}
-                </div>
-              ))}
-              <div
-                style={{
-                  marginTop: 24,
-                  display: "inline-flex",
-                  gap: 12,
-                  alignItems: "center",
-                  color: c.green,
-                  fontFamily: base.fontFamily,
-                  fontWeight: 850,
-                }}
-              >
-                <div
-                  style={{
-                    width: 12,
-                    height: 12,
-                    borderRadius: 99,
-                    background: c.green,
-                    boxShadow: `0 0 20px ${c.green}`,
-                  }}
-                />
-                done
-              </div>
-            </div>
-          </Window>
-        </div>
-      </div>
-    </Scene>
-  );
-};
-
-const Control = () => {
-  const frame = useCurrentFrame();
-  const keys = [
-    ["n", "run now"],
-    ["p", "pause"],
-    ["t", "retry"],
-    ["h", "history"],
-  ];
-  return (
-    <Scene index="05 / 06">
-      <div
-        style={{
-          width: "100%",
-          display: "grid",
-          gridTemplateColumns: "1.1fr 0.9fr",
-          gap: 88,
-          alignItems: "center",
-        }}
-      >
-        <div style={enter(frame, 12)}>
-          <Window title="Herdr Automations · popup board" accent={c.cyan}>
-            <div style={{ padding: 30 }}>
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1.2fr 1fr 0.8fr 0.8fr",
-                  padding: "0 18px 13px",
-                  color: c.muted,
-                  fontSize: 20,
-                  fontWeight: 760,
-                }}
-              >
-                <div>Automation</div>
-                <div>Trigger</div>
-                <div>Next run</div>
-                <div>Status</div>
-              </div>
-              {[
-                ["Daily research", "cron weekday", "tomorrow 09:00", "succeeded", c.green],
-                ["Inbox summary", "every 30m", "in 18m", "scheduled", c.cyan],
-                ["Blocked alert", "Herdr event", "watching", "enabled", c.violet],
-              ].map(([name, trigger, next, status, color], i) => (
-                <div
-                  key={name}
-                  style={{
-                    ...enter(frame, 24 + i * 8),
-                    display: "grid",
-                    gridTemplateColumns: "1.2fr 1fr 0.8fr 0.8fr",
-                    padding: "20px 18px",
-                    borderTop: `1px solid ${c.line}`,
-                    alignItems: "center",
-                    fontSize: 21,
-                  }}
-                >
-                  <div style={{ fontWeight: 820 }}>{name}</div>
-                  <div style={{ color: c.muted }}>{trigger}</div>
-                  <div>{next}</div>
-                  <div style={{ color, fontWeight: 820 }}>{status}</div>
-                </div>
-              ))}
-              <div style={{ display: "flex", gap: 14, marginTop: 28 }}>
-                {keys.map(([key, label]) => (
-                  <div
-                    key={key}
-                    style={{
-                      display: "flex",
-                      gap: 9,
-                      alignItems: "center",
-                      color: c.muted,
-                      fontSize: 20,
-                    }}
-                  >
-                    <div
-                      style={{
-                        width: 35,
-                        height: 35,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        borderRadius: 8,
-                        background: c.panel2,
-                        border: `1px solid ${c.line}`,
-                        color: c.text,
-                        fontWeight: 850,
-                      }}
-                    >
-                      {key}
-                    </div>
-                    {label}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </Window>
-        </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
-          <div style={enter(frame, 0)}>
-            <Badge>4. Observar y controlar</Badge>
-          </div>
-          <div style={enter(frame, 8)}>
-            <Title>
-              Estado, historial
-              <br />
-              <span style={{ color: c.cyan }}>y control manual.</span>
-            </Title>
-          </div>
-          <div style={enter(frame, 16)}>
-            <Copy>Run now, pause, retry, cancel seguro y diagnóstico desde un popup.</Copy>
-          </div>
-        </div>
-      </div>
-    </Scene>
-  );
-};
-
-const Finale = () => {
-  const frame = useCurrentFrame();
-  return (
-    <Scene index="06 / 06">
-      <div
-        style={{
-          width: "100%",
-          textAlign: "center",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: 30,
-        }}
-      >
-        <div style={enter(frame, 0)}>
-          <Badge color={c.green}>Open source · Herdr 0.8+</Badge>
-        </div>
-        <div style={enter(frame, 8)}>
-          <Title>
-            Automatizaciones durables.
-            <br />
-            <span style={{ color: c.green }}>Agentes observables.</span>
-          </Title>
-        </div>
-        <div style={{ ...enter(frame, 16), maxWidth: 1040 }}>
-          <Copy>
-            Cron, intervalos y eventos Herdr. Configuración declarativa. Ejecución visible. Control
-            desde el board.
-          </Copy>
+        <div style={{ color: c.cyan, fontWeight: 900, paddingLeft: 8 }}>
+          {index === selected ? ">" : ""}
         </div>
         <div
           style={{
-            ...enter(frame, 26),
-            marginTop: 10,
-            display: "flex",
-            alignItems: "center",
-            gap: 18,
-            padding: "22px 30px",
-            borderRadius: 20,
-            background: c.panel,
-            border: `2px solid ${c.line}`,
-            fontFamily: "SFMono-Regular, Menlo, monospace",
-            fontSize: 27,
+            color: row.state === "running" ? c.green : row.state === "disabled" ? c.muted : c.text,
           }}
         >
-          <span style={{ color: c.muted }}>$</span>
-          <span style={{ color: c.cyan }}>herdr plugin install</span>
-          <span>ram4-dev/herdr-automations</span>
+          {row.state}
+        </div>
+        <div style={{ fontWeight: 800 }}>{row.id}</div>
+        <div style={{ color: c.muted }}>{row.trigger}</div>
+        <div>{row.next}</div>
+        <div style={{ color: row.last.startsWith("succeeded") ? c.green : c.muted }}>
+          {row.last}
         </div>
       </div>
-    </Scene>
+    ))}
+    <div style={{ height: 1, background: c.line, margin: "15px 0 13px" }} />
+    <div
+      style={{
+        display: "flex",
+        gap: 17,
+        alignItems: "center",
+        color: c.muted,
+        fontFamily: ui.fontFamily,
+        fontSize: 16,
+      }}
+    >
+      <span>
+        <Key>?</Key> help
+      </span>
+      <span>
+        <Key>r</Key> reload
+      </span>
+      <span>
+        <Key>p</Key> pause
+      </span>
+      <span>
+        <Key>e</Key> enable
+      </span>
+      <span>
+        <Key>n</Key> run
+      </span>
+      <span>
+        <Key>c</Key> cancel
+      </span>
+      <span>
+        <Key>t</Key> retry
+      </span>
+      <span>
+        <Key>h</Key> hist
+      </span>
+      <span>
+        <Key>o</Key> config
+      </span>
+    </div>
+    <div
+      style={{
+        height: 26,
+        marginTop: 12,
+        color: message.includes("queued") ? c.cyan : message.includes("paused") ? c.amber : c.green,
+      }}
+    >
+      {message}
+    </div>
+  </div>
+);
+
+const YamlEditor = ({ frame }: { frame: number }) => {
+  const allLines = [
+    "version: 1",
+    "defaults:",
+    "  timezone: America/Argentina/Buenos_Aires",
+    "  overlap: skip",
+    "",
+    "automations:",
+    "  - id: inbox-summary",
+    "    name: Inbox summary",
+    "    enabled: true",
+    "    cwd: /Users/ramiro/Desktop/projects/personales",
+    "    trigger:",
+    "      type: interval",
+    "      every: 30m",
+    "    action:",
+    "      type: agent",
+    "      kind: codex",
+    "      name: inbox-summary",
+    '      prompt: "Summarize new email and next actions."',
+  ];
+  const typed = Math.floor(
+    interpolate(frame, [115, 205], [6, allLines.length], {
+      ...clamp,
+      easing: Easing.bezier(0.22, 1, 0.36, 1),
+    }),
+  );
+  return (
+    <div style={{ ...mono, padding: "22px 28px", fontSize: 19, lineHeight: 1.38, minHeight: 540 }}>
+      {allLines.slice(0, typed).map((line, index) => {
+        const parts = line.match(/^(\s*-?\s*)([^:]+:)(.*)$/);
+        return (
+          <div key={`${index}-${line}`} style={{ minHeight: 27, display: "flex" }}>
+            <span style={{ width: 38, color: "#52627A", textAlign: "right", marginRight: 22 }}>
+              {index + 1}
+            </span>
+            {parts ? (
+              <>
+                <span>{parts[1]}</span>
+                <span style={{ color: c.cyan }}>{parts[2]}</span>
+                <span style={{ color: parts[3].includes("true") ? c.green : c.text }}>
+                  {parts[3]}
+                </span>
+              </>
+            ) : (
+              <span>{line}</span>
+            )}
+          </div>
+        );
+      })}
+      <div style={{ display: "flex", marginLeft: 60 }}>
+        <div
+          style={{
+            width: 11,
+            height: 24,
+            background: c.violet,
+            opacity: Math.floor(frame / 8) % 2 ? 1 : 0.25,
+          }}
+        />
+      </div>
+      <div
+        style={{
+          position: "absolute",
+          left: 0,
+          right: 0,
+          bottom: 0,
+          height: 31,
+          padding: "5px 18px",
+          background: "#302A68",
+          color: "white",
+          fontSize: 15,
+        }}
+      >
+        NORMAL automations.yaml {typed}/{allLines.length}
+      </div>
+    </div>
   );
 };
 
-const timing = linearTiming({ durationInFrames: 12 });
+const AgentPane = ({ frame }: { frame: number }) => {
+  const lines = [
+    ["›", "Summarize new email and next actions.", c.violet],
+    ["•", "Using Gmail connector in read-only mode…", c.muted],
+    ["•", "Found 3 new threads since the last run.", c.muted],
+    ["•", "Prioritizing decisions and follow-ups…", c.muted],
+    ["✓", "Summary complete. 2 actions need attention.", c.green],
+  ] as const;
+  const visible = Math.floor(interpolate(frame, [365, 465], [1, lines.length], clamp));
+  return (
+    <div style={{ ...mono, padding: "27px 31px", fontSize: 20, lineHeight: 1.6, minHeight: 475 }}>
+      {lines.slice(0, visible).map(([mark, text, color], index) => (
+        <div
+          key={text}
+          style={{
+            opacity: interpolate(frame, [365 + index * 22, 375 + index * 22], [0, 1], clamp),
+            color,
+            marginBottom: 10,
+          }}
+        >
+          <span style={{ display: "inline-block", width: 34, fontWeight: 900 }}>{mark}</span>
+          {text}
+        </div>
+      ))}
+      {frame >= 460 && (
+        <div
+          style={{
+            ...ui,
+            marginTop: 24,
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 10,
+            color: c.green,
+            fontSize: 21,
+            fontWeight: 850,
+          }}
+        >
+          <div
+            style={{
+              width: 11,
+              height: 11,
+              borderRadius: 99,
+              background: c.green,
+              boxShadow: `0 0 20px ${c.green}`,
+            }}
+          />
+          done
+        </div>
+      )}
+    </div>
+  );
+};
 
-export const HerdrAutomationsFeatureVideo = () => (
-  <AbsoluteFill style={{ backgroundColor: c.bg }}>
-    <TransitionSeries>
-      <TransitionSeries.Sequence durationInFrames={150}>
-        <Intro />
-      </TransitionSeries.Sequence>
-      <TransitionSeries.Transition
-        presentation={slide({ direction: "from-right" })}
-        timing={timing}
-      />
-      <TransitionSeries.Sequence durationInFrames={150}>
-        <Configure />
-      </TransitionSeries.Sequence>
-      <TransitionSeries.Transition presentation={fade()} timing={timing} />
-      <TransitionSeries.Sequence durationInFrames={150}>
-        <Schedule />
-      </TransitionSeries.Sequence>
-      <TransitionSeries.Transition
-        presentation={slide({ direction: "from-bottom" })}
-        timing={timing}
-      />
-      <TransitionSeries.Sequence durationInFrames={150}>
-        <Execute />
-      </TransitionSeries.Sequence>
-      <TransitionSeries.Transition presentation={fade()} timing={timing} />
-      <TransitionSeries.Sequence durationInFrames={150}>
-        <Control />
-      </TransitionSeries.Sequence>
-      <TransitionSeries.Transition
-        presentation={slide({ direction: "from-right" })}
-        timing={timing}
-      />
-      <TransitionSeries.Sequence durationInFrames={210}>
-        <Finale />
-      </TransitionSeries.Sequence>
-    </TransitionSeries>
-  </AbsoluteFill>
+const History = () => (
+  <div style={{ ...mono, padding: "24px 30px", minHeight: 465, fontSize: 18, lineHeight: 1.75 }}>
+    <div style={{ color: c.cyan, fontWeight: 900, marginBottom: 15 }}>History · inbox-summary</div>
+    <div>
+      <span style={{ color: c.muted }}>run_0042</span>{" "}
+      <span style={{ color: c.green }}>succeeded</span> agent done · 16.2s
+    </div>
+    <div>
+      <span style={{ color: c.muted }}>run_0041</span>{" "}
+      <span style={{ color: c.green }}>succeeded</span> agent done · 14.8s
+    </div>
+    <div>
+      <span style={{ color: c.muted }}>run_0040</span>{" "}
+      <span style={{ color: c.amber }}>skipped_overlap</span> active run exists
+    </div>
+    <div style={{ marginTop: 28, color: c.muted }}>[q] back</div>
+  </div>
 );
+
+const Toast = ({
+  text,
+  frame,
+  start,
+  end,
+}: {
+  text: string;
+  frame: number;
+  start: number;
+  end: number;
+}) => (
+  <div
+    style={{
+      ...ui,
+      position: "absolute",
+      left: "50%",
+      bottom: 48,
+      translate: "-50% 0",
+      opacity: fade(frame, start, end),
+      padding: "12px 18px",
+      borderRadius: 12,
+      background: "#111827E8",
+      border: `1px solid ${c.line}`,
+      boxShadow: "0 16px 45px #00000070",
+      fontSize: 18,
+      fontWeight: 700,
+    }}
+  >
+    {text}
+  </div>
+);
+
+const Cursor = ({ frame }: { frame: number }) => {
+  const keyframes = [
+    [0, 1450, 650],
+    [75, 1470, 765],
+    [250, 620, 508],
+    [320, 590, 487],
+    [520, 590, 487],
+    [610, 590, 487],
+    [720, 590, 487],
+    [899, 590, 487],
+  ];
+  let segment = 0;
+  while (segment < keyframes.length - 2 && frame > keyframes[segment + 1][0]) segment += 1;
+  const a = keyframes[segment];
+  const b = keyframes[segment + 1];
+  const x = interpolate(frame, [a[0], b[0]], [a[1], b[1]], clamp);
+  const y = interpolate(frame, [a[0], b[0]], [a[2], b[2]], clamp);
+  const click = [80, 260, 325, 525, 615, 725].some((at) => Math.abs(frame - at) < 5);
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: x,
+        top: y,
+        width: 28,
+        height: 38,
+        zIndex: 50,
+        scale: click ? 0.82 : 1,
+      }}
+    >
+      <svg viewBox="0 0 28 38" width="28" height="38">
+        <path
+          d="M2 2 L24 22 L14 24 L20 35 L15 37 L9 26 L2 32 Z"
+          fill="white"
+          stroke="#0A0D12"
+          strokeWidth="2"
+        />
+      </svg>
+      {click && (
+        <div
+          style={{
+            position: "absolute",
+            left: -13,
+            top: -13,
+            width: 45,
+            height: 45,
+            borderRadius: 99,
+            border: `3px solid ${c.cyan}`,
+            opacity: 0.8,
+          }}
+        />
+      )}
+    </div>
+  );
+};
+
+const Desktop = ({ frame }: { frame: number }) => {
+  const initialRows: Row[] = [
+    {
+      state: "enabled",
+      id: "daily-research",
+      trigger: "cron 0 9 * * 1-5",
+      next: "tomorrow 09:00",
+      last: "succeeded@09:00",
+    },
+    {
+      state: "enabled",
+      id: "blocked-alert",
+      trigger: "event pane.agent_status",
+      next: "-",
+      last: "-",
+    },
+  ];
+  const rows: Row[] = [
+    {
+      state: frame >= 335 && frame < 475 ? "running" : "enabled",
+      id: "inbox-summary",
+      trigger: "every 30m",
+      next: frame >= 475 ? "in 29m" : "in 30m",
+      last: frame >= 475 ? "succeeded@12:30" : "-",
+    },
+    ...initialRows,
+  ];
+
+  const editorOpen = frame >= 95 && frame < 230;
+  const splitOpen = frame >= 345 && frame < 500;
+  const historyOpen = frame >= 605 && frame < 690;
+  const paused = frame >= 730;
+  const boardMessage =
+    frame >= 230 && frame < 285
+      ? "opened config and reloaded"
+      : frame >= 320 && frame < 365
+        ? "queued inbox-summary"
+        : frame >= 730
+          ? "paused"
+          : "";
+
+  return (
+    <AbsoluteFill style={{ ...ui, background: c.desktop }}>
+      <div
+        style={{
+          height: 38,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "0 20px",
+          background: "#0D1119",
+          borderBottom: `1px solid #202A3A`,
+          fontSize: 14,
+          color: c.muted,
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
+          <span style={{ color: c.text, fontWeight: 850 }}>Herdr</span>
+          <span>Workspace: personales</span>
+        </div>
+        <div>Thu Aug 13 · 12:30</div>
+      </div>
+      <div
+        style={{
+          height: 50,
+          display: "flex",
+          alignItems: "center",
+          background: c.chrome,
+          borderBottom: `1px solid ${c.line}`,
+        }}
+      >
+        <div style={{ width: 245, paddingLeft: 24, fontWeight: 800 }}>personales</div>
+        {["1  shell", "2  code", "3  auto:inbox-summary"].map((tab, i) => (
+          <div
+            key={tab}
+            style={{
+              height: "100%",
+              display: "flex",
+              alignItems: "center",
+              padding: "0 25px",
+              color: splitOpen && i === 2 ? c.text : c.muted,
+              background: splitOpen && i === 2 ? c.chrome2 : "transparent",
+              borderBottom:
+                splitOpen && i === 2 ? `3px solid ${c.violet}` : "3px solid transparent",
+              fontSize: 16,
+              fontWeight: 700,
+            }}
+          >
+            {tab}
+          </div>
+        ))}
+      </div>
+      <div
+        style={{ height: "calc(100% - 88px)", display: "grid", gridTemplateColumns: "245px 1fr" }}
+      >
+        <div
+          style={{
+            background: "#0D121B",
+            borderRight: `1px solid ${c.line}`,
+            padding: "21px 15px",
+          }}
+        >
+          <div
+            style={{
+              fontSize: 13,
+              fontWeight: 850,
+              color: c.muted,
+              letterSpacing: 1,
+              padding: "0 10px 12px",
+            }}
+          >
+            WORKSPACE
+          </div>
+          {["README.md", "automations.yaml", "src/", "tests/", "video/"].map((item, i) => (
+            <div
+              key={item}
+              style={{
+                height: 34,
+                display: "flex",
+                alignItems: "center",
+                gap: 9,
+                padding: "0 10px",
+                borderRadius: 7,
+                color: i === 1 && editorOpen ? c.text : c.muted,
+                background: i === 1 && editorOpen ? "#202B3E" : "transparent",
+                fontSize: 15,
+              }}
+            >
+              <span style={{ color: i < 2 ? c.cyan : c.violet }}>{i < 2 ? "◇" : "▸"}</span>
+              {item}
+            </div>
+          ))}
+          <div
+            style={{
+              marginTop: 30,
+              fontSize: 13,
+              fontWeight: 850,
+              color: c.muted,
+              letterSpacing: 1,
+              padding: "0 10px 12px",
+            }}
+          >
+            AGENTS
+          </div>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 9,
+              padding: "8px 10px",
+              fontSize: 15,
+            }}
+          >
+            <span
+              style={{
+                width: 9,
+                height: 9,
+                borderRadius: 99,
+                background: splitOpen ? c.green : c.muted,
+              }}
+            />
+            inbox-summary{" "}
+            <span style={{ marginLeft: "auto", color: splitOpen ? c.green : c.muted }}>
+              {splitOpen ? "working" : "done"}
+            </span>
+          </div>
+        </div>
+        <div
+          style={{
+            position: "relative",
+            overflow: "hidden",
+            background: "radial-gradient(circle at 85% 10%, #191541, transparent 32%), #090D14",
+          }}
+        >
+          {!editorOpen && (
+            <div style={{ position: "absolute", inset: "34px 42px" }}>
+              <TerminalWindow
+                title="Herdr Automations · popup"
+                style={{ width: splitOpen ? "56%" : "88%", margin: "0 auto" }}
+              >
+                {historyOpen ? (
+                  <History />
+                ) : (
+                  <Board selected={0} rows={rows} paused={paused} message={boardMessage} />
+                )}
+              </TerminalWindow>
+              {splitOpen && (
+                <TerminalWindow
+                  title="auto:inbox-summary · Codex"
+                  style={{ position: "absolute", top: 28, right: 0, width: "43%" }}
+                >
+                  <AgentPane frame={frame} />
+                </TerminalWindow>
+              )}
+            </div>
+          )}
+          {editorOpen && (
+            <div style={{ position: "absolute", inset: "24px 34px" }}>
+              <TerminalWindow
+                title="automations.yaml · $EDITOR"
+                style={{ height: "100%", position: "relative" }}
+              >
+                <YamlEditor frame={frame} />
+              </TerminalWindow>
+            </div>
+          )}
+          <Toast text="Press o · edit automations.yaml" frame={frame} start={55} end={108} />
+          <Toast
+            text="Save & close · config reloads automatically"
+            frame={frame}
+            start={190}
+            end={242}
+          />
+          <Toast text="Press n · run now" frame={frame} start={285} end={345} />
+          <Toast
+            text="The agent runs in a visible reusable pane"
+            frame={frame}
+            start={375}
+            end={475}
+          />
+          <Toast text="Press h · inspect durable history" frame={frame} start={565} end={615} />
+          <Toast
+            text="Press p · pause all automatic triggers"
+            frame={frame}
+            start={695}
+            end={745}
+          />
+        </div>
+      </div>
+      <Cursor frame={frame} />
+    </AbsoluteFill>
+  );
+};
+
+export const HerdrAutomationsFeatureVideo = () => {
+  const frame = useCurrentFrame();
+  const intro = interpolate(frame, [0, 18], [0, 1], {
+    ...clamp,
+    easing: Easing.bezier(0.16, 1, 0.3, 1),
+  });
+  const outro = interpolate(frame, [820, 855], [0, 1], {
+    ...clamp,
+    easing: Easing.bezier(0.16, 1, 0.3, 1),
+  });
+  return (
+    <AbsoluteFill style={{ background: "#05070B" }}>
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          opacity: intro,
+          scale: interpolate(frame, [0, 25], [1.025, 1], clamp),
+        }}
+      >
+        <Desktop frame={frame} />
+      </div>
+      <div
+        style={{
+          ...ui,
+          position: "absolute",
+          inset: 0,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexDirection: "column",
+          gap: 22,
+          background: "#070A10F2",
+          opacity: outro,
+          pointerEvents: "none",
+        }}
+      >
+        <div style={{ fontSize: 68, fontWeight: 900, letterSpacing: -3 }}>Herdr Automations</div>
+        <div style={{ fontSize: 30, color: c.muted }}>
+          Durable scheduling. Visible execution. Full control.
+        </div>
+        <div
+          style={{
+            ...mono,
+            marginTop: 10,
+            padding: "17px 24px",
+            borderRadius: 14,
+            background: c.terminal,
+            border: `1px solid ${c.line}`,
+            fontSize: 23,
+          }}
+        >
+          <span style={{ color: c.muted }}>$ </span>
+          <span style={{ color: c.cyan }}>herdr plugin install</span> ram4-dev/herdr-automations
+        </div>
+      </div>
+    </AbsoluteFill>
+  );
+};
