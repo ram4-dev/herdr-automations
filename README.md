@@ -7,6 +7,8 @@ Declarative cron, interval, and Herdr-event automations for Herdr 0.8 (protocol 
 
 Plugin id: `ram4.herdr-automations`
 
+https://raw.githubusercontent.com/ram4-dev/herdr-automations/docs/automation-permission-safety-video/video/pr-preview.gif
+
 ## Trust and security
 
 This plugin runs as your user with full access to the Herdr CLI/socket for the session that started it. Treat YAML `command` and `agent` actions like shell scripts you chose to run. Review `herdr-plugin.toml` and `automations.yaml` before linking or installing. History and logs redact common secret patterns and secret-looking env keys, but do not put credentials in prompts, commands, or YAML if you can avoid it.
