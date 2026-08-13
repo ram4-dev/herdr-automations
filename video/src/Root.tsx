@@ -1,15 +1,15 @@
 import { Composition } from "remotion";
-import { AutomationPermissionsVideo } from "./Video";
+import { HerdrAutomationsFeatureVideo } from "./Video";
 
 export const Root = () => {
   return (
     <Composition
-      id="HerdrAutomationPermissions"
-      component={AutomationPermissionsVideo}
-      durationInFrames={1050}
+      id="HerdrAutomationsFeature"
+      component={HerdrAutomationsFeatureVideo}
+      durationInFrames={900}
       fps={30}
-      width={1080}
-      height={1920}
+      width={1920}
+      height={1080}
     />
   );
 };

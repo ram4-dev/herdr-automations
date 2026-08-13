@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "studio": "remotion studio src/index.ts --no-open",
-    "render": "remotion render src/index.ts HerdrAutomationPermissions out/herdr-automation-permissions.mp4",
-    "still": "remotion still src/index.ts HerdrAutomationPermissions out/preview.png --frame=525"
+    "render": "remotion render src/index.ts HerdrAutomationsFeature out/herdr-automations-feature.mp4",
+    "still": "remotion still src/index.ts HerdrAutomationsFeature out/preview.png --frame=450"
   },
   "dependencies": {
     "@remotion/cli": "4.0.509",

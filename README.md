@@ -167,7 +167,7 @@ For recurring agent actions that write through an external connector (email, mes
 
 ## Demo video
 
-The vertical Remotion explainer in `video/` demonstrates this permission boundary and the verification loop. Render it with:
+The 16:9 Remotion product video in `video/` demonstrates the complete automation workflow: declarative configuration, durable scheduling, visible execution, status/history, and controls. Render it with:
 
 ```sh
 cd video
@@ -175,7 +175,7 @@ npm install
 npm run render
 ```
 
-The MP4 is written to `video/out/herdr-automation-permissions.mp4` and intentionally ignored by Git.
+The MP4 is written to `video/out/herdr-automations-feature.mp4` and intentionally ignored by Git.
 
 ## License
 
